@@ -1,13 +1,13 @@
 ﻿=== Injection Guard ===
-Contributors: fahadmahmood, alianwaar91
+Contributors: fahadmahmood, invoicepress, alianwaar91
 Tags: security, tool, anti-hacking, blacklist
 Requires at least: 3.0
-Tested up to: 6.5
-Stable tag: 1.2.4
+Tested up to: 6.6
+Stable tag: 1.2.5
 Requires PHP: 7.0
 License: GPL2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-This plugin will block all unauthorized and irrelevant requests through query strings by redirecting them to an appropriate error page instead of generating identical results for it.
+This plugin will block all unauthorized and irrelevant requests through query strings. 
 
 == Description ==
 * Author: [Fahad Mahmood](https://www.androidbubbles.com/contact)
@@ -16,7 +16,7 @@ This plugin will block all unauthorized and irrelevant requests through query st
 
 * License: GPL 3. See License below for copyright jots and tittles.
 
-Injection Guard is a wordpress plugin which helps you to get relax about security of your website which can be disturbed by invalid query string based requests. It is much better that if you are using pretty permalinks so you can deny all of the query string parameters straightaway instead of having headache of a list of whitelisted parameters and blacklisted as well. I am a PHP, Wordpress developer and i faced a lot of inconvenience regarding keep an eye on security threats related to query strings and user's activity. Our debugging process demands continuous monitoring to the number of requests and their types. So, I coded a number of fixes for wordpress sites and few of them are in form of articles on my blog.
+Injection Guard is a wordpress plugin which helps you to get relax about security of your website which can be disturbed by invalid query string based requests. It is much better that if you are using pretty permalinks so you can deny all of the query string parameters straightaway instead of having headache of a list of whitelisted parameters and blacklisted as well. I am a PHP, Wordpress developer and i faced a lot of inconvenience regarding keep an eye on security threats related to query strings and user's activity. Our debugging process demands continuous monitoring to the number of requests and their types. So, I coded a number of fixes for wordpress sites and few of them are in form of articles on my blog. This plugin will block all unauthorized and irrelevant requests through query strings by redirecting them to an appropriate error page instead of generating identical results for it.
 
 = Tags =
 injection shield
