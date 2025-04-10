@@ -1,49 +1,75 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; 
 /*
 	Plugin Name: Injection Guard
-	Plugin URI: http://androidbubble.com/blog/wordpress/plugins/injection-guard
-	Description: This plugin will block all unauthorized and irrelevant requests through query strings by redirecting them to an appropriate error page instead of generating identical results for it.
-	Version: 1.2.5
-	Author: Fahad Mahmood 
+	Plugin URI: https://www.androidbubbles.com/extends/wordpress/plugins/injection-guard
+	Description: Blocks unauthorized and irrelevant query string requests by redirecting them to a safe error page, enhancing security without bloating your site.
+	Version: 1.2.7
+	Author: Fahad Mahmood
 	Author URI: https://www.androidbubbles.com
 	Text Domain: injection-guard
 	Domain Path: /languages/
 	License: GPL2
 	
-	This WordPress Plugin is free software: you can redistribute it and/or modify
+	This WordPress plugin is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 2 of the License, or
-	any later version.
-	 
+	the Free Software Foundation, either version 2 of the License, or any later version.
+	
 	This free software is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 	GNU General Public License for more details.
-	 
+	
 	You should have received a copy of the GNU General Public License
-	along with this software. If not, see http://www.gnu.org/licenses/gpl-2.0.html.
-*/ 
+	along with this software. If not, see https://www.gnu.org/licenses/gpl-2.0.html
+*/
+
 
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-	include('functions.php');
+	include_once('functions.php');
 
 
 	global $ig_logs;
 	global $ig_blacklisted;
-    global $ig_rs;	
+    global $ig_rs, $ig_pro, $ig_pro_link, $ig_dir, $ig_url, $ig_data, $ig_title, $ig_title_v;	
 	
 	
-	$ig_rs = array();      
+	$ig_rs = array();  
+	$ig_pro_link = 'https://shop.androidbubbles.com/product/injection-guard';    
 	$ig_rs[] = '<a target="_blank" href="plugin-install.php?tab=search&s=wp+mechanic&plugin-search-input=Search+Plugins">Install WP Mechanic</a>';
 	$ig_rs[] = '<a target="_blank" href="http://androidbubble.com/blog/contact">Contact Developer</a>';
-        
+	
+
+	$ig_dir = plugin_dir_path( __FILE__ );
+    $ig_url = plugin_dir_url( __FILE__ );
+	$ig_data = get_plugin_data(__FILE__, true, false);
+
+	
+	$ig_pro_file = realpath($ig_dir.'pro/functions.php');
+	$ig_pro = file_exists($ig_pro_file);     
+	
+	$ig_title = ($ig_data['Name'].' &#128737; '.($ig_pro?' Pro':''));
+	$ig_title_v = $ig_title.' ('.$ig_data['Version'].')';	
+	
+	if($ig_pro){
+		//include_once($ig_pro_file);
+	}
 	
 	
 	function ig_menu(){
-
-		 add_options_page('Injection Guard', 'IG Settings', 'activate_plugins', 'ig_settings', 'ig_settings');
 		
+		global $ig_title, $ig_title;
+
+		add_options_page($ig_title, $ig_title, 'activate_plugins', 'ig_settings', 'ig_settings');
+			
+		add_users_page(
+			__( 'Capability Audit', 'injection-guard' ).' &#128462;',
+			__( 'Capability Audit', 'injection-guard' ).' &#128462;',
+			'manage_options',
+			'capability-audit',
+			'ig_capability_audit_page'
+		);
+
 
 	}
 	
@@ -56,7 +82,7 @@
  			
 		}
 
-		global $ig_logs, $ig_blacklisted;
+		global $ig_logs, $ig_blacklisted, $ig_title, $ig_title_v, $ig_pro, $ig_pro_link;
 		$guard_obj = new guard_wordpress;
 		$ig_blacklisted = $guard_obj->get_blacklisted();
 		$ig_logs = $guard_obj->get_requests_log();
@@ -91,8 +117,8 @@
 	function register_ig_styles($hook_suffix) {
 
 
-		
-		if($hook_suffix!='settings_page_ig_settings')
+
+		if(!in_array($hook_suffix, array('settings_page_ig_settings', 'users_page_capability-audit')))
 		return false;
 
 		
@@ -139,6 +165,7 @@
 		
 
 		$ig_translation = array(
+			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'ig_nonce' => wp_create_nonce('ig_nonce_action'),
 			'ig_super_admin' => is_super_admin(),
 			'ig_super_admin_msg' => __('You need administrator privileges to proceed.', 'injection-guard')

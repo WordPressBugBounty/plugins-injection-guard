@@ -1,7 +1,11 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
 <div class="wrap ig_settings">
 
-<div class="icon32" id="icon-options-general"><br></div><h2><span class="icon-large icon-settings"></span>&nbsp;Injection Guard - Settings</h2>
+<?php if(!$ig_pro): ?>
+<a title="<?php _e('Click here to download pro version','injection-guard'); ?>" style="background-color: #25bcf0;    color: #fff !important;    padding: 2px 30px;    cursor: pointer;    text-decoration: none;    font-weight: bold;    right: 0;    position: absolute;    top: 0;    box-shadow: 1px 1px #ddd;" href="https://shop.androidbubbles.com/download/" target="_blank"><?php echo __('Already a Pro Member?','injection-guard'); ?></a>
+<?php endif; ?>
+
+<div class="icon32" id="icon-options-general"><br></div><h2>&#128137; <?php echo $ig_title_v; ?> <?php if(!$ig_pro){ ?><a class="ig-gopro" target="_blank" href="<?php echo esc_url($ig_pro_link); ?>"><?php _e("Go Premium",'injection-guard'); ?></a><?php } ?></h2>
 <hr />
 <div class="list_head">
 <a class="ig_how_link">How it works?</a>

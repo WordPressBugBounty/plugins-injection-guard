@@ -107,4 +107,26 @@ jQuery(document).ready(function($){
 
     })
 
+	let ig_cap_audit_offset = 0;
+	let ig_cap_audit_loading = false;
+	const ig_cap_audit_per_page = 100;
+
+	function load_ig_cap_audit_report() {
+		if (ig_cap_audit_loading) return;
+		if($('#cap-audit-results').length==0) return;
+		
+		loading = true;
+		fetch(ig_obj.ajaxurl + '?action=ig_load_capability_audit&offset=' + ig_cap_audit_offset + '&per_page=' + ig_cap_audit_per_page + '&security=' + ig_obj.ig_nonce)
+		.then(res => res.text())
+		.then(html => {
+			if (html.trim()) {
+				document.getElementById('cap-audit-results').insertAdjacentHTML('beforeend', html);
+				ig_cap_audit_offset += ig_cap_audit_per_page;
+				ig_cap_audit_loading = false;
+				load_ig_cap_audit_report(); // Auto-load next batch
+			}
+		});
+	}
+	
+	load_ig_cap_audit_report();
 });

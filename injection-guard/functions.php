@@ -166,13 +166,19 @@
 
 	function ig_plugin_links($links) { 
 
-	  $settings_link = '<a href="options-general.php?page=ig_settings">'.__('Settings', 'injection-guard').'</a>'; 
-
-	  $premium_link = '<a href="https://shop.androidbubbles.com/go/" title="'.__('Go Premium', 'injection-guard').'" target="_blank">'.__('Go Premium', 'injection-guard').'</a>'; 
-
-	  array_unshift($links, $settings_link,$premium_link); 
-
-	  return $links; 
+		global $ig_pro, $ig_pro_link;		
+		
+		$settings_link = '<a href="options-general.php?page=ig_settings">'.__('Settings', 'injection-guard').'</a>'; 
+		
+		$premium_link = '';
+		
+		if(!$ig_pro){
+			$premium_link = '<a href="'.$ig_pro_link.'" title="'.__('Go Premium', 'injection-guard').'" target="_blank">'.__('Go Premium', 'injection-guard').'</a>'; 
+		}
+		
+		array_unshift($links, $settings_link,$premium_link); 
+		
+		return $links; 
 
 	}
 	
@@ -314,4 +320,161 @@
 
 		}
 
+	}
+	add_action( 'wp_login', function( $user_login, $user ) {
+		update_user_meta( $user->ID, 'ig_last_login', time() );
+		update_user_meta( $user->ID, 'ig_session_start', time() );
+	}, 10, 2 );
+	
+	add_action( 'wp_logout', function() {
+		$user_id = get_current_user_id();
+		if ( $user_id ) {
+			$start = get_user_meta( $user_id, 'ig_session_start', true );
+			$end   = time();
+	
+			if ( $start ) {
+				$duration = $end - $start;
+				update_user_meta( $user_id, 'ig_last_session_duration', $duration );
+				update_user_meta( $user_id, 'ig_last_logout', $end );
+			}
+		}
+	});
+	
+	add_filter( 'manage_users_columns', function( $columns ) {
+		$columns['ig_last_login']     = __( 'Last Login', 'injection-guard' );
+		$columns['ig_last_logout']    = __( 'Last Logout', 'injection-guard' );
+		$columns['ig_session_length'] = __( 'Session Duration', 'injection-guard' );
+		return $columns;
+	} );
+	
+	add_filter( 'manage_users_custom_column', function( $value, $column_name, $user_id ) {
+		if ( $column_name === 'ig_last_login' ) {
+			$login  = get_user_meta( $user_id, 'ig_last_login', true );
+			$start  = get_user_meta( $user_id, 'ig_session_start', true );
+			$display = $login ?: $start;
+			return $display ? date( 'Y-m-d H:i:s', $display ) : '—';
+		}
+	
+		if ( $column_name === 'ig_last_logout' ) {
+			$logout = get_user_meta( $user_id, 'ig_last_logout', true );
+			return $logout ? date( 'Y-m-d H:i:s', $logout ) : '—';
+		}
+	
+		if ( $column_name === 'ig_session_length' ) {
+			$start     = get_user_meta( $user_id, 'ig_session_start', true );
+			$last_seen = get_user_meta( $user_id, 'ig_last_seen', true );
+			if ( $start && $last_seen && $last_seen > $start ) {
+				$duration = $last_seen - $start;
+				return gmdate( 'H:i:s', $duration );
+			}
+			return '—';
+		}
+	
+		return $value;
+	}, 10, 3 );
+	
+
+	
+	
+	function ig_capability_audit_page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( __( 'You are not allowed to access this page.', 'injection-guard' ) );
+		}
+		?>
+		<div class="wrap">
+			<h1><?php _e( 'Capability Audit', 'injection-guard' ); ?> &#128462;</h1>
+			<table id="cap-audit-table">
+				<thead>
+                  <tr>
+                    <th><?php _e( 'ID', 'injection-guard' ); ?></th>
+                    <th><?php _e( 'Username', 'injection-guard' ); ?></th>
+                    <th><?php _e( 'Email', 'injection-guard' ); ?></th>
+                    <th><?php _e( 'Capabilities', 'injection-guard' ); ?></th>
+                  </tr>
+                </thead>
+
+				<tbody id="cap-audit-results"></tbody>
+			</table>
+		
+		</div>
+		<?php
+	}
+	
+	add_action('wp_ajax_ig_load_capability_audit', function() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Unauthorized', 403 );
+		}
+	
+		check_ajax_referer( 'ig_nonce_action', 'security' );
+
+		
+		global $wpdb;
+		$offset = intval($_GET['offset'] ?? 0);
+		$per_page = intval($_GET['per_page'] ?? 100);
+		$cap_key = $wpdb->prefix . 'capabilities';
+	
+		$results = $wpdb->get_results( $wpdb->prepare("
+			SELECT u.ID as user_id, u.user_login, u.user_email, um.meta_value as caps
+			FROM {$wpdb->users} u
+			INNER JOIN {$wpdb->usermeta} um ON um.user_id = u.ID
+			WHERE um.meta_key = %s
+			ORDER BY u.ID ASC
+			LIMIT %d OFFSET %d
+		", $cap_key, $per_page, $offset) );
+	
+		if ( $offset === 0 ) {
+			echo '<style>table { border-collapse: collapse; width: 100%; margin-top: 1em; } td, th { border: 1px solid #ccc; padding: 6px; font-size: 13px; } .flag { background: #fff3f3; color: #b00; font-weight: bold; }</style>';
+		}
+	
+		foreach ( $results as $row ) {
+			$caps = maybe_unserialize( $row->caps );
+			$cap_list = [];
+			$suspicious = false;
+	
+			foreach ( (array) $caps as $cap => $value ) {
+				if ( $value ) {
+					$cap_list[] = $cap;
+					if ( in_array( $cap, [ 'manage_options', 'edit_users', 'install_plugins', 'delete_users' ] ) ) {
+						$suspicious = true;
+					}
+				}
+			}
+	
+			$user_link = admin_url("user-edit.php?user_id={$row->user_id}");
+			$class = ($suspicious || trim($row->user_login, '-') === '') ? 'flag' : '';
+	
+			echo "<tr class='{$class}'>";
+			echo "<td><a href='{$user_link}' target='_blank'>{$row->user_id}</a></td>";
+			echo "<td>{$row->user_login}</td>";
+			echo "<td>{$row->user_email}</td>";
+			echo "<td>" . implode(', ', $cap_list ?: ['—']) . "</td>";
+			echo "</tr>";
+		}
+	
+		wp_die();
+	});
+	
+	add_action( 'init', 'ig_track_user_session_ping', 1 );
+	add_action( 'admin_init', 'ig_track_user_session_ping', 1 );
+	
+	function ig_track_user_session_ping() {
+		if ( ! is_user_logged_in() ) return;
+	
+		$user_id = get_current_user_id();
+		$now     = time();
+	
+		$start     = get_user_meta( $user_id, 'ig_session_start', true );
+		$last_seen = get_user_meta( $user_id, 'ig_last_seen', true );
+	
+		if ( empty( $start ) || ! is_numeric( $start ) || $start > $now ) {
+			update_user_meta( $user_id, 'ig_session_start', $now );
+			update_user_meta( $user_id, 'ig_last_seen', $now );
+			update_user_meta( $user_id, 'ig_last_session_duration', 0 );
+			return;
+		}
+	
+		if ( empty( $last_seen ) || ( $now - intval( $last_seen ) ) >= 300 ) {
+			update_user_meta( $user_id, 'ig_last_seen', $now );
+			update_user_meta( $user_id, 'ig_last_session_duration', $now - intval( $start ) );
+		}
 	}
