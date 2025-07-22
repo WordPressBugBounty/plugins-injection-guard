@@ -3,7 +3,7 @@ Contributors: fahadmahmood, invoicepress, alianwaar91
 Tags: security, anti-hacking, sql injection, firewall, wordpress security, injection guard
 Requires at least: 3.0
 Tested up to: 6.8
-Stable tag: 1.2.7
+Stable tag: 1.2.8
 Requires PHP: 7.0
 License: GPL2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -63,6 +63,8 @@ Yes. Use the plugin support tab or contact the author via the provided link.
 2. Capability audit screen with suspicious flagging
 
 == Changelog ==
+= 1.2.8 =
+* Security Fix: Escaped `$_SERVER['REQUEST_URI']` output to prevent Reflected Cross-Site Scripting (XSS) vulnerability in the admin logs tab. [Thanks to WPScan / 22/07/2025].
 = 1.2.7 =
 * Enhanced security for capability audit with proper nonce validation and admin-only access.
 = 1.2.6 =
@@ -97,6 +99,8 @@ Yes. Use the plugin support tab or contact the author via the provided link.
 * Releasing with WP Mechanic free help feature.
 
 == Upgrade Notice ==
+= 1.2.8 =
+Security Fix: Escaped `$_SERVER['REQUEST_URI']` output to prevent Reflected Cross-Site Scripting (XSS) vulnerability in the admin logs tab.
 = 1.2.7 =
 Enhanced security for capability audit with proper nonce validation and admin-only access.
 = 1.2.6 =

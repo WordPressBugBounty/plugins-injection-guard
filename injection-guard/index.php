@@ -3,7 +3,7 @@
 	Plugin Name: Injection Guard
 	Plugin URI: https://www.androidbubbles.com/extends/wordpress/plugins/injection-guard
 	Description: Blocks unauthorized and irrelevant query string requests by redirecting them to a safe error page, enhancing security without bloating your site.
-	Version: 1.2.7
+	Version: 1.2.8
 	Author: Fahad Mahmood
 	Author URI: https://www.androidbubbles.com
 	Text Domain: injection-guard

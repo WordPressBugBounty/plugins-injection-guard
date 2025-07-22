@@ -45,8 +45,8 @@ class guard_plugins implements guard_base{
 	
 	public function init(){
 		$this->request = $_REQUEST;
-		$this->request_uri = isset($_SERVER['REQUEST_URI'])?$_SERVER['REQUEST_URI']:'';
-		$this->query_string = isset($_SERVER['QUERY_STRING'])?$_SERVER['QUERY_STRING']:'';
+		$this->request_uri = isset($_SERVER['REQUEST_URI']) ? esc_url( $_SERVER['REQUEST_URI'] ) : '';
+		$this->query_string = isset($_SERVER['QUERY_STRING']) ? esc_url_raw($_SERVER['QUERY_STRING']) : '';
 		$this->request_uri_cleaned = $this->cleaned_uri();
 	}
 	

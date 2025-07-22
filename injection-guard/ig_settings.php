@@ -17,7 +17,8 @@
 
 </div>
 
-<form action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post">
+<form action="<?php echo esc_url( $_SERVER['REQUEST_URI'] ); ?>" method="post">
+
 
 <ul class="nav nav-tabs">
 	<li class="nav-item mb-0" role="presentation">
