@@ -130,11 +130,14 @@
 			
 			} elseif(is_super_admin()) {
 
-				$val = isset($_POST['val'])?esc_attr($_POST['val']):'';
+				$val  = isset($_POST['val']) ? sanitize_text_field($_POST['val']) : '';
+
 	
-				$type = isset($_POST['type'])?esc_attr($_POST['type']):'';
+				$type = isset($_POST['type']) && in_array($_POST['type'], ['whitelist','blacklist']) ? $_POST['type'] : 'blacklist';
+
 	
 				$uri = isset($_POST['uri_index'])?esc_attr($_POST['uri_index']):'';
+				
 	
 				
 	
@@ -152,11 +155,12 @@
 	
 				}
 	
-				echo json_encode($ret);
+
+				wp_send_json_success($ret);
+
 				
 			}
 
-			exit;
 
 		}
 
@@ -263,64 +267,44 @@
 		return array(count($customer_orders), $total, $products);
 	}	
 
-	if(!function_exists('ig_update_bulk_backlist')){
-
-		function ig_update_bulk_backlist(){	
-
-
-			$result_array = array();
-			
-			if ( 
-				! isset( $_POST['ig_nonce'] ) 
-				|| ! wp_verify_nonce( $_POST['ig_nonce'], 'ig_nonce_action' ) 
-			) {
-			
-			   print __('Sorry, your nonce did not verify.','injection-guard');
-			   exit;
-			
-			} elseif(is_super_admin()) {
-			
-			   // process form data
-
-			  
-
-			   $posted_data = sanitize_ig_data($_POST);
-				
-			   $ig_type = $posted_data['ig_type'];
-			   $ig_post_obj = $posted_data['ig_post_obj'];
-			   $guard_obj = new guard_wordpress;
-
-			   if(!empty($ig_post_obj)){
-				   foreach($ig_post_obj as $uri => $val_array){
-					   if(!empty($val_array)){
-						   foreach($val_array as $val){
-
-							if($ig_type == 'whitelist'){
-   
-								$guard_obj->update_blacklisted($val, $uri, false);
-				
-							}else{
-				
-								$guard_obj->update_blacklisted($val, $uri, true);
-				
-							}
-
-						   }
-					   }
-				   }
-			   }
-
-			   
-   
-
+	if (!function_exists('ig_update_bulk_backlist')) {
+		function ig_update_bulk_backlist() {
+			// Verify nonce first
+			if (!isset($_POST['ig_nonce']) || !wp_verify_nonce($_POST['ig_nonce'], 'ig_nonce_action')) {
+				wp_send_json_error(['message' => __('Sorry, your nonce did not verify.', 'injection-guard')], 400);
 			}
-
-			// wp_send_json($result_array);
-			exit;
-
+	
+			// Only allow super admins
+			if (!is_super_admin()) {
+				wp_send_json_error(['message' => __('Unauthorized action.', 'injection-guard')], 403);
+			}
+	
+			// Sanitize posted data with depth-safe function
+			$posted_data = sanitize_ig_data($_POST);
+	
+			$ig_type     = $posted_data['ig_type'] ?? 'blacklist';
+			$ig_post_obj = $posted_data['ig_post_obj'] ?? [];
+	
+			$guard_obj = new guard_wordpress;
+	
+			if (!empty($ig_post_obj)) {
+				foreach ($ig_post_obj as $uri => $val_array) {
+					if (!empty($val_array)) {
+						foreach ($val_array as $val) {
+							if ($ig_type === 'whitelist') {
+								$guard_obj->update_blacklisted($val, $uri, false);
+							} else {
+								$guard_obj->update_blacklisted($val, $uri, true);
+							}
+						}
+					}
+				}
+			}
+	
+			wp_send_json_success(['message' => __('Updated successfully.', 'injection-guard')]);
 		}
-
 	}
+
 	add_action( 'wp_login', function( $user_login, $user ) {
 		update_user_meta( $user->ID, 'ig_last_login', time() );
 		update_user_meta( $user->ID, 'ig_session_start', time() );
@@ -444,10 +428,10 @@
 			$class = ($suspicious || trim($row->user_login, '-') === '') ? 'flag' : '';
 	
 			echo "<tr class='{$class}'>";
-			echo "<td><a href='{$user_link}' target='_blank'>{$row->user_id}</a></td>";
-			echo "<td>{$row->user_login}</td>";
-			echo "<td>{$row->user_email}</td>";
-			echo "<td>" . implode(', ', $cap_list ?: ['—']) . "</td>";
+			echo "<td><a href='" . esc_url($user_link) . "' target='_blank'>" . esc_html($row->user_id) . "</a></td>";
+			echo "<td>" . esc_html($row->user_login) . "</td>";
+			echo "<td>" . esc_html($row->user_email) . "</td>";
+			echo "<td>" . esc_html(implode(', ', $cap_list ?: ['—'])) . "</td>";
 			echo "</tr>";
 		}
 	

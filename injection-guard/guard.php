@@ -1,25 +1,30 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; 
 
+		
+	function sanitize_ig_data($input, $depth = 0) {
+		if ($depth > 10) return null; // Prevent too deep recursion
 	
-	if(!function_exists('sanitize_ig_data')){
-		function sanitize_ig_data( $input ) {
-			if(is_array($input)){		
-				$new_input = array();	
-				foreach ( $input as $key => $val ) {
-					$new_input[ $key ] = (is_array($val)?sanitize_ig_data($val):sanitize_text_field( $val ));
-				}			
-			}else{
-				$new_input = sanitize_text_field($input);			
-				if(stripos($new_input, '@') && is_email($new_input)){
-					$new_input = sanitize_email($new_input);
-				}
-				if(stripos($new_input, 'http') || wp_http_validate_url($new_input)){
-					$new_input = sanitize_url($new_input);
-				}			
-			}	
-			return $new_input;
-		}	
-	}	
+		if (is_array($input)) {
+			$new_input = array();
+			foreach ($input as $key => $val) {
+				$clean_key = sanitize_text_field($key);
+				$new_input[$clean_key] = is_array($val) ? sanitize_ig_data($val, $depth + 1) : sanitize_text_field($val);
+			}
+		} else {
+			$new_input = sanitize_text_field($input);
+	
+			if (is_email($new_input)) {
+				$new_input = sanitize_email($new_input);
+			}
+	
+			if (wp_http_validate_url($new_input)) {
+				$new_input = esc_url_raw($new_input);
+			}
+		}
+	
+		return $new_input;
+	}
+
 ####################################
 ###### INJECTION GUARD CLASS #######
 ####################################

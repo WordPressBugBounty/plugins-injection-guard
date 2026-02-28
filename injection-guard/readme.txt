@@ -2,8 +2,8 @@
 Contributors: fahadmahmood, invoicepress, alianwaar91
 Tags: security, anti-hacking, sql injection, firewall, wordpress security, injection guard
 Requires at least: 3.0
-Tested up to: 6.8
-Stable tag: 1.2.8
+Tested up to: 6.9
+Stable tag: 1.2.9
 Requires PHP: 7.0
 License: GPL2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -63,6 +63,10 @@ Yes. Use the plugin support tab or contact the author via the provided link.
 2. Capability audit screen with suspicious flagging
 
 == Changelog ==
+= 1.2.9 =
+* Security Fix: Added depth-limited recursive sanitization for all POST/array inputs to prevent possible injection or malformed data attacks. [Thanks to Wordfence / 28/02/2026].
+* Security Fix: Enforced stricter nonce and super-admin checks on bulk whitelist/blacklist updates. [Thanks to Wordfence / 28/02/2026].
+* Security Fix: Standardized all AJAX JSON responses to use wp_send_json_success() / wp_send_json_error() for safer output. [Thanks to Wordfence / 28/02/2026].
 = 1.2.8 =
 * Security Fix: Escaped `$_SERVER['REQUEST_URI']` output to prevent Reflected Cross-Site Scripting (XSS) vulnerability in the admin logs tab. [Thanks to WPScan / 22/07/2025].
 = 1.2.7 =
@@ -99,6 +103,8 @@ Yes. Use the plugin support tab or contact the author via the provided link.
 * Releasing with WP Mechanic free help feature.
 
 == Upgrade Notice ==
+= 1.2.9 =
+Security Fix: Added depth-limited input sanitization and stricter nonce & super-admin checks for bulk whitelist/blacklist updates.
 = 1.2.8 =
 Security Fix: Escaped `$_SERVER['REQUEST_URI']` output to prevent Reflected Cross-Site Scripting (XSS) vulnerability in the admin logs tab.
 = 1.2.7 =
