@@ -1,9 +1,9 @@
 ﻿=== Injection Guard ===
 Contributors: fahadmahmood, invoicepress, alianwaar91
-Tags: security, anti-hacking, sql injection, firewall, wordpress security, injection guard
+Tags: security, anti-hacking, sql injection, firewall, wordpress security
 Requires at least: 3.0
 Tested up to: 6.9
-Stable tag: 1.2.9
+Stable tag: 1.3.0
 Requires PHP: 7.0
 License: GPL2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -63,6 +63,8 @@ Yes. Use the plugin support tab or contact the author via the provided link.
 2. Capability audit screen with suspicious flagging
 
 == Changelog ==
+= 1.3.0 =
+* Security: Fixed Stored XSS vulnerability by sanitizing query parameter keys, escaping admin output, improving query handling, and adding a log size limit. [Thanks to Wordfence / 15/03/2026 / Aramsri (Boeing777)].
 = 1.2.9 =
 * Security Fix: Added depth-limited recursive sanitization for all POST/array inputs to prevent possible injection or malformed data attacks. [Thanks to Wordfence / 28/02/2026].
 * Security Fix: Enforced stricter nonce and super-admin checks on bulk whitelist/blacklist updates. [Thanks to Wordfence / 28/02/2026].
@@ -103,6 +105,8 @@ Yes. Use the plugin support tab or contact the author via the provided link.
 * Releasing with WP Mechanic free help feature.
 
 == Upgrade Notice ==
+= 1.3.0 =
+Security: Fixed Stored XSS vulnerability by sanitizing query parameter keys, escaping admin output, improving query handling, and adding a log size limit.
 = 1.2.9 =
 Security Fix: Added depth-limited input sanitization and stricter nonce & super-admin checks for bulk whitelist/blacklist updates.
 = 1.2.8 =

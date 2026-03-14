@@ -245,3 +245,6 @@ ul.ig_bulk_action .ig_params input[type="checkbox"]{
 	display: block;
 	padding: 22px 0 0 0;
 }
+div.ig_settings p.welcome-panel {
+	color: white;
+}

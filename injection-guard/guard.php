@@ -2,24 +2,52 @@
 
 		
 	function sanitize_ig_data($input, $depth = 0) {
-		if ($depth > 10) return null; // Prevent too deep recursion
+	
+		if ($depth > 10) {
+			return null; // prevent deep recursion
+		}
 	
 		if (is_array($input)) {
+	
 			$new_input = array();
+	
 			foreach ($input as $key => $val) {
-				$clean_key = sanitize_text_field($key);
-				$new_input[$clean_key] = is_array($val) ? sanitize_ig_data($val, $depth + 1) : sanitize_text_field($val);
+	
+				// sanitize array key
+				$clean_key = sanitize_key($key);
+	
+				// sanitize value
+				if (is_array($val)) {
+					$new_input[$clean_key] = sanitize_ig_data($val, $depth + 1);
+				} else {
+	
+					$val = sanitize_text_field(wp_unslash($val));
+	
+					if (is_email($val)) {
+						$val = sanitize_email($val);
+					}
+	
+					if (wp_http_validate_url($val)) {
+						$val = esc_url_raw($val);
+					}
+	
+					$new_input[$clean_key] = $val;
+				}
 			}
+	
 		} else {
-			$new_input = sanitize_text_field($input);
 	
-			if (is_email($new_input)) {
-				$new_input = sanitize_email($new_input);
+			$input = sanitize_text_field(wp_unslash($input));
+	
+			if (is_email($input)) {
+				$input = sanitize_email($input);
 			}
 	
-			if (wp_http_validate_url($new_input)) {
-				$new_input = esc_url_raw($new_input);
+			if (wp_http_validate_url($input)) {
+				$input = esc_url_raw($input);
 			}
+	
+			$new_input = $input;
 		}
 	
 		return $new_input;
@@ -51,7 +79,7 @@ class guard_plugins implements guard_base{
 	public function init(){
 		$this->request = $_REQUEST;
 		$this->request_uri = isset($_SERVER['REQUEST_URI']) ? esc_url( $_SERVER['REQUEST_URI'] ) : '';
-		$this->query_string = isset($_SERVER['QUERY_STRING']) ? esc_url_raw($_SERVER['QUERY_STRING']) : '';
+		$this->query_string = isset($_SERVER['QUERY_STRING']) ? wp_unslash($_SERVER['QUERY_STRING']) : '';
 		$this->request_uri_cleaned = $this->cleaned_uri();
 	}
 	
@@ -97,6 +125,7 @@ class guard_plugins implements guard_base{
 		$updated_log[$this->request_uri_cleaned] = is_array($updated_log[$this->request_uri_cleaned])?$updated_log[$this->request_uri_cleaned]:(array)$updated_log[$this->request_uri_cleaned];
 		
 		parse_str($this->query_string, $updated_log_temp);
+		$updated_log_temp = sanitize_ig_data($updated_log_temp);
 		$time = time();
 
 		// $rand = rand(0, 5);
@@ -155,6 +184,10 @@ class guard_wordpress extends guard_plugins{
 
 		$updated_log = $this->get_requests_log_updated($updated_log);
 		
+		if (count($updated_log) > 500) {
+			$updated_log = array_slice($updated_log, -500);
+		}
+		
 		update_option( 'ig_requests_log', sanitize_ig_data($updated_log) );
 		
 	}
@@ -175,6 +208,9 @@ class guard_wordpress extends guard_plugins{
 	}	
 	
 	public function get_requests_log(){
+		if (!current_user_can('manage_options')) {
+			return;
+		}
 		return get_option('ig_requests_log');
 	}
 	
@@ -193,6 +229,8 @@ class guard_wordpress extends guard_plugins{
 		parse_str($this->query_string, $ret);
 		
 		$ret = !empty($ret)?array_keys($ret):$ret;
+		
+		$ret = sanitize_ig_data($ret);
 		
 		return $ret;
 	}

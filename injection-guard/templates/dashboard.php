@@ -12,14 +12,14 @@
 						if(!is_array($v)){
 			?>				
 
-							<li><b><?php echo ucwords(str_replace('_', ' ', $k)); ?>:</b> <?php echo $v; ?></li>
+							<li><b><?php echo ucwords(str_replace('_', ' ', $k)); ?>:</b> <?php echo esc_html($v); ?></li>
 							
 			<?php                
 						}else{
 							foreach($v as $i=>$j){
 			?>				
 
-							<li><b><?php echo ucwords(str_replace('_', ' ', $i)); ?>:</b> <?php echo $j; ?></li>
+							<li><b><?php echo ucwords(str_replace('_', ' ', $i)); ?>:</b> <?php echo esc_html($j); ?></li>
 							
 			<?php  					
 							}
@@ -181,15 +181,15 @@
 			}
 			
 ?>
-		<tr class="<?php echo $row_class; ?>">
-        	<td><?php echo $c; ?></td>
-        	<td><?php echo  get_woocommerce_currency_symbol().($amount).' ('.$orders.')'; ?></td>
-            <td><?php echo $products_list; ?></td>
-        	<td><?php echo ($customers->display_name).' - '.$customers->ID; ?></td>
-            <td><?php echo ($customers->user_email); ?></td>
-            <td><?php echo ($customers->user_registered); ?></td>
-            <td><?php echo $last_login.' / '.$the_login_date; ?></td>
-            <td><?php echo $ip_list; ?></td>
+		<tr class="<?php echo esc_attr($row_class); ?>">
+        	<td><?php echo esc_html($c); ?></td>
+        	<td><?php echo  esc_html(get_woocommerce_currency_symbol().($amount).' ('.$orders.')'); ?></td>
+            <td><?php echo esc_html($products_list); ?></td>
+        	<td><?php echo esc_html($customers->display_name).' - '.$customers->ID; ?></td>
+            <td><?php echo esc_html($customers->user_email); ?></td>
+            <td><?php echo esc_html($customers->user_registered); ?></td>
+            <td><?php echo esc_html($last_login.' / '.$the_login_date); ?></td>
+            <td><?php echo esc_html($ip_list); ?></td>
         </tr>
 <?php		//exit;
 			
