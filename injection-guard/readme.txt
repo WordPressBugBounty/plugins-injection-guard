@@ -2,8 +2,8 @@
 Contributors: fahadmahmood, invoicepress, alianwaar91
 Tags: security, anti-hacking, sql injection, firewall, wordpress security
 Requires at least: 3.0
-Tested up to: 6.9
-Stable tag: 1.3.0
+Tested up to: 7.0
+Stable tag: 1.3.1
 Requires PHP: 7.0
 License: GPL2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
