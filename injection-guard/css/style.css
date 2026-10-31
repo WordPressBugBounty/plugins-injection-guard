@@ -248,3 +248,75 @@ ul.ig_bulk_action .ig_params input[type="checkbox"]{
 div.ig_settings p.welcome-panel {
 	color: white;
 }
+
+/* ---------- 1.4.0 additions ---------- */
+.ig_settings .ig-hidden{ display:none !important; }
+.ig_settings .ig-member-link{
+	background-color:#25bcf0; color:#fff !important; padding:2px 30px; text-decoration:none;
+	font-weight:bold; right:0; position:absolute; top:0; box-shadow:1px 1px #ddd;
+}
+.ig_settings .ig-notice{ margin:12px 0; }
+
+/* global admin tidy-up that the plugin screens always had */
+.update-nag,
+#message{ display:none; }
+[class^="icon-"], [class*=" icon-"]{ margin-right:6px; }
+#wpcontent, #wpfooter{ background-color:#fff; }
+.welcome-panel{ padding:22px 10px 16px; }
+
+.ig_settings .nav-tabs{ margin-top:14px; }
+.ig_settings .nav-tabs .nav-link{ cursor:pointer; }
+
+.ig_settings .ig-cards{ display:flex; flex-wrap:wrap; gap:12px; margin:18px 0 8px; clear:both; }
+.ig_settings .ig-card{
+	flex:1 1 150px; border:1px solid #dcdcde; border-left:4px solid #2271b1; border-radius:4px;
+	background:#f6f7f7; padding:12px 14px; display:flex; flex-direction:column;
+}
+.ig_settings .ig-card.ig-card-alert{ border-left-color:#d63638; }
+.ig_settings .ig-card-num{ font-size:26px; font-weight:700; line-height:1.2; color:#1d2327; }
+.ig_settings .ig-card-label{ font-size:12px; color:#50575e; }
+
+.ig_settings .ig-status{ margin:10px 0 18px; }
+.ig_settings .ig-chip{
+	display:inline-block; font-size:12px; padding:3px 10px; border-radius:999px; margin-right:6px;
+	background:#f0f0f1; color:#3c434a; border:1px solid #dcdcde;
+}
+.ig_settings .ig-chip.on{ background:#edfaef; border-color:#68de7c; color:#005c12; }
+.ig_settings .ig-chip.off{ background:#fcf0f1; border-color:#f1a1a3; color:#8a2424; }
+
+.ig_settings .ig-badge{ display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:3px; }
+.ig_settings .ig-badge.bad{ background:#fcf0f1; color:#8a2424; }
+.ig_settings .ig-badge.warn{ background:#fcf9e8; color:#6e5800; }
+
+.ig_settings .ig-mini-table,
+.ig_settings .ig-blocked-table{ margin:8px 0 18px; }
+.ig_settings .ig-blocked-table code,
+.ig_settings .ig-mini-table code{ background:#f0f0f1; }
+
+.ig_settings .ig_toolbar{ margin:10px 0 14px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; clear:both; }
+.ig_settings .ig_toolbar input[type="search"]{ min-width:260px; }
+
+.ig_settings ul.ig_log_list{ clear:both; }
+.ig_settings .ig_log_list li.ig_param_row{ overflow:hidden; }
+
+.ig_settings .ig-settings-form h3{ margin-top:24px; }
+.ig_settings .ig-settings-form textarea.code{ font-size:13px; }
+
+.ig_settings .ig-pro-box{
+	max-width:760px; margin:18px 0; padding:18px 22px; border:1px solid #bfa14e; border-radius:6px; background:#fffdf5;
+}
+.ig_settings .ig-pro-list li{ margin:10px 0; }
+.ig_settings .ig-pro-box .button-primary{ background:#1a1a1a; border-color:#bfa14e; color:#bfa14e; }
+
+/* capability audit screen */
+.ig_audit #cap-audit-table{ margin-top:12px; }
+.ig_audit #cap-audit-table td,
+.ig_audit #cap-audit-table th{ font-size:13px; }
+.ig_audit #cap-audit-table tr.flag td{ background:#fff3f3; color:#b00; font-weight:600; }
+.ig_audit .ig_audit_tools{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+
+@media (max-width:782px){
+	.ig_settings .ig-card{ flex-basis:45%; }
+	.ig_settings .ig_toolbar input[type="search"]{ min-width:100%; }
+	.ig_settings .ig-member-link{ position:static; display:inline-block; margin-bottom:8px; }
+}
